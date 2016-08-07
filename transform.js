@@ -1,5 +1,4 @@
 module.exports = function (document) {
-    var _source = document._source;
-    //_source.somfield = '';
+    document._source.somefield = 'test';
     return document;
 }
