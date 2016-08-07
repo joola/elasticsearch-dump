@@ -114,6 +114,14 @@ elasticdump.prototype.dump = function(callback, continuing, limit, offset, total
       if(err){  self.emit('error', err); }
       if(!err || (self.options['ignore-errors'] === true || self.options['ignore-errors'] === 'true') ){
         self.log("got " + data.length + " objects from source " + self.inputType + " (offset: "+offset+")");
+        var transform = self.options.transform;
+        if (transform) {
+          var transformlib = require(transform);
+          data.forEach(function(hit){
+            hit = transformlib(hit);
+          });
+          self.log("transformed " + data.length + " objects on transit to " + self.outputType + " (offset: "+offset+")");
+        }
         self.output.set(data, limit, offset, function(err, writes){
           var toContinue = true;
 

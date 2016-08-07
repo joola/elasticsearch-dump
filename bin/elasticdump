@@ -29,6 +29,7 @@ var defaults = {
   toLog:           null,
   awsAccessKeyId:    null,
   awsSecretAccessKey:null,
+  transform: null
 };
 
 var options = {};

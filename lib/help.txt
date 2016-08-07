@@ -81,7 +81,19 @@ Usage: elasticdump --input SOURCE --output DESTINATION [OPTIONS]
                     When using Amazon Elasticsearch Service proteced by
                     AWS Identity and Access Management (IAM), provide
                     your Access Key ID and Secret Access Key
+--transform
+                    Path to a Javascript file containing logic of document
+                    transformation. Each document read from the input stream is
+                    passed through the transformation function.
+                    The function must export a single function which receives
+                    the entire document and returns the transform document:
 
+                    ```javascript
+                    module.exports = function(document) {
+                      document._source.somefield = 'this is transformed';
+                      return document;
+                    };
+                    ```
 --help
                     This page
 
@@ -118,6 +130,12 @@ elasticdump \
   --input=http://production.es.com:9200/my_index \
   --output=query.json \
   --searchBody '{"query":{"term":{"username": "admin"}}}'
+
+# Copy and transform an index from production to staging:
+elasticdump \
+  --input=http://production.es.com:9200/my_index \
+  --output=http://staging.es.com:9200/my_index \
+  --transform=./transform.js
 
 ------------------------------------------------------------------------------
 Learn more @ https://github.com/taskrabbit/elasticsearch-dump

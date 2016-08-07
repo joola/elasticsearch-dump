@@ -234,6 +234,18 @@ Usage: elasticdump --input SOURCE --output DESTINATION [OPTIONS]
                     When using Amazon Elasticsearch Service proteced by
                     AWS Identity and Access Management (IAM), provide
                     your Access Key ID and Secret Access Key
+--transform
+                    Path to a Javascript file containing logic of document
+                    transformation. Each document read from the input stream is
+                    passed through the transformation function.
+                    The function must export a single function which receives
+                    the entire document and returns the transform document:
+
+                    module.exports = function(document) {
+                      document._source.somefield = 'this is transformed';
+                      return document;
+                    };
+
 --help
                     This page
 ```
@@ -242,6 +254,23 @@ Usage: elasticdump --input SOURCE --output DESTINATION [OPTIONS]
 Elasticsearch provides a [scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html) API to fetch all documents of an index starting form (and keeping) a consistent snapshot in time, which we use under the hood.  This method is safe to use for large exports since it will maintain the result set in cache for the given period of time.
 
 NOTE: only works for `--output`
+
+## Document transformation
+
+Use the `--transform` switch to specify a Javascript file path which includes the transformation logic.
+
+Each document read from the input stream is passed through the transformation function.
+The function must export a single function which receives the entire document and returns the transform document:
+
+```javascript
+//transform.js
+
+module.exports = function (document) {
+    var _source = document._source;
+    //_source.somfield = '';
+    return document;
+}
+```
 
 ## MultiElasticDump
 This package also ships with a second binary, `multielasticdump`.  This is a wrapper for the normal elasticdump binary, which provides a limited option set, but will run elasticdump in parallel across many indexes at once.  It runs a process which forks into `n` (default your running host's # of CPUs) subprocesses running elasticdump.
